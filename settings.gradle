@@ -1,0 +1,10 @@
+rootProject.name = 'uaa-behind-zuul'
+include ':api-gateway'
+include ':service-registry'
+include ':dummy-service'
+include ':uaa-service'
+
+project(':api-gateway').projectDir = "$rootDir/api-gateway" as File
+project(':service-registry').projectDir = "$rootDir/service-registry" as File
+project(':dummy-service').projectDir = "$rootDir/dummy-service" as File
+project(':uaa-service').projectDir = "$rootDir/uaa-service" as File
