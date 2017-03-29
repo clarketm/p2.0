@@ -1,27 +1,61 @@
-allprojects  {
-  apply plugin: 'maven'
-
-  group = 'com.kakawait'
-version = '0.0.4-SNAPSHOT'
+buildscript {
+    repositories { jcenter() }
+    dependencies {
+        classpath 'se.transmode.gradle:gradle-docker:1.2'
+    }
 }
 
+allprojects {
+    apply plugin: 'idea'
+    apply plugin: 'docker'
+
+    group = 'clarketm'
+    version = '0.0.1'
+}
+
+
 subprojects {
-  apply plugin: 'java'
-  sourceCompatibility = 1.8
-  targetCompatibility = 1.8
-  tasks.withType(JavaCompile) {
-  	options.encoding = 'UTF-8'
-  }
+    apply plugin: 'java'
 
-  
-  repositories {
-    mavenLocal()
-    
-    maven { url "https://repo.spring.io/libs-release" }
-    maven { url "http://repo.maven.apache.org/maven2" }
-  }
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
 
-  
-  
-  
+    repositories {
+        mavenLocal()
+
+        maven { url "https://repo.spring.io/libs-release" }
+        maven { url "http://repo.maven.apache.org/maven2" }
+    }
+
+    task prepDocker(type: Copy, dependsOn: assemble) {
+        from "$rootDir/docker"
+        into "src/main/docker"
+        include 'Dockerfile.template'
+        rename { file -> 'Dockerfile' }
+        expand(project: project, jar: jar)
+        doLast {
+            println "Docker command: docker build -t ${jar.group}/${jar.baseName}:${jar.version} build/docker"
+        }
+    }
+
+    task buildDocker(type: Docker, dependsOn: build) {
+        push = true
+        applicationName = jar.baseName
+        dockerfile = file('src/main/docker/Dockerfile')
+        doFirst {
+            copy {
+                from jar
+                into stageDir
+            }
+        }
+    }
+
+    configure([prepDocker, buildDocker]) {
+        group = 'Docker'
+        description = 'Docker tasks'
+    }
+
 }

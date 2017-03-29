@@ -1,0 +1,5 @@
+FROM frolvlad/alpine-oraclejdk8:slim
+VOLUME /tmp
+ADD ${jar.baseName}-${jar.version}.jar ${project.name}.jar
+ENTRYPOINT ["sh", "-c", "-Djava.security.egd=file:/dev/./urandom -jar /${project.name}.jar"]
+

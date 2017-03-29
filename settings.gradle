@@ -1,4 +1,4 @@
-rootProject.name = 'uaa-behind-zuul'
+rootProject.name = 'p2.0'
 include ':api-gateway'
 include ':service-registry'
 include ':dummy-service'
